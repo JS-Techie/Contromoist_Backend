@@ -3,21 +3,35 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+//Import logging middleware
+const {logger} = require("./middleware")
+
 //Import all routes
 const routes = require("./routes")
+
+
 
 const server = express();
 server.use(cors());
 server.use(express.json()); 
 
 
+server.use(logger)
+
+
+
 server.get("/", (req, res) => {
-  res.send("Hello, World!");
+  return res.status(400).send({
+    success : true,
+    data : [],
+    devMessage : "Erro dev",
+    clientMessage : "Error happened"
+  })
 });
 
 server.use("/api",routes)
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
