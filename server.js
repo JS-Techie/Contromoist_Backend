@@ -21,8 +21,6 @@ server.get("/", (req, res) => {
 
 setupRoutes(server)
 
-
-
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   setupDB()
