@@ -50,7 +50,7 @@ class AWSFileManager {
             };
 
             const data = await s3.listObjectsV2(params).promise();
-            return data.Contents;
+            return (data.Contents,true);
         } catch (error) {
             console.error('Error fetching all files:', error);
             return(error,false)
@@ -65,7 +65,7 @@ class AWSFileManager {
             };
 
             const data = await s3.getObject(params).promise();
-            return data.Body;
+            return (data.Body,true);
         } catch (error) {
             console.error('Error fetching file by Id:', error);
             return(error,false)
@@ -76,7 +76,7 @@ class AWSFileManager {
         try {
             const fileContent = await this.getFileById(fileId);
             console.log('File Content:', fileContent.toString());
-            return fileContent;
+            return (fileContent,true);
         } catch (error) {
             console.error('Error viewing file:', error);
             return(error,false)

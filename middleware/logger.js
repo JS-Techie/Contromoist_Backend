@@ -8,7 +8,7 @@ morgan.token("logger", (req, res) => {
         STATUS: res.statusCode,
         HEADERS: req.headers,
         USER: req.user ? req.user.id : "Not authenticated",
-        REQUEST_BODY: req.method !== "GET" ? req.body : undefined,
+        REQUEST_BODY: req.method !== "GET" ? req.body : null,
     });
 
     return "";
