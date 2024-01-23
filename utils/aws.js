@@ -1,5 +1,4 @@
 
-// Fetch s3 from config/aws.js
 const {s3} = require("../config")
 const fs = require('fs')
 
