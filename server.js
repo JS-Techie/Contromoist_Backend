@@ -21,11 +21,8 @@ server.use(logger)
 
 
 server.get("/", (req, res) => {
-  return res.status(400).send({
-    success : true,
-    data : [],
-    devMessage : "Erro dev",
-    clientMessage : "Error happened"
+  return res.status(200).send({
+    hello : "World"
   })
 });
 
