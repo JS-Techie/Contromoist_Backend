@@ -2,7 +2,7 @@ const morgan = require("morgan");
 const {print} = require("../utils")
 
 morgan.token("logger", (req, res) => {
-    print({
+    print(JSON.stringify({
         TIMESTAMP: new Date().toISOString(),
         METHOD: req.method,
         API_URL: req.url,
@@ -10,7 +10,7 @@ morgan.token("logger", (req, res) => {
         HEADERS: req.headers,
         USER: req.user ? req.user.id : "Not authenticated",
         REQUEST_BODY: req.method !== "GET" ? req.body : null,
-    },"LOG");
+    }),"LOG");
 
     return "";
 });
