@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-const {setupDB} = require("./utils")
+const {setupDB,print} = require("./utils")
 const {logger} = require("./middleware")
 const setupRoutes = require("./routes")
 
@@ -24,5 +24,5 @@ setupRoutes(server)
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   setupDB()
-  console.log(`Server is running on port ${PORT}`);
+  print(`Server is running on ${PORT}`,"SUCCESS")
 });

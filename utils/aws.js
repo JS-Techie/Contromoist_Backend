@@ -16,10 +16,10 @@ class AWSFileManager {
             };
 
             const data = await s3.upload(params).promise();
-            console.log('File uploaded successfully:', key);
+            print(`File upload: ${key}`, "SUCCESS");
             return (data,true);
         } catch (error) {
-            console.error('Error uploading file:', error);
+            print(`File upload: ${error}`, "ERROR");
             return(error,false);
         }
     }
@@ -35,10 +35,10 @@ class AWSFileManager {
             };
 
             const data = await s3.upload(params).promise();
-            console.log('Base64 file uploaded successfully:', key);
+            print(`base 64 File upload: ${key}`, "SUCCESS");
             return(data,true)
         } catch (error) {
-            console.error('Error uploading base64 file:', error);
+            print(`base 64 File upload: ${error}`, "ERROR");
             return(error,false)
         }
     }
@@ -49,9 +49,10 @@ class AWSFileManager {
             };
 
             const data = await s3.listObjectsV2(params).promise();
+            print(`all Files fetch from aws`, "SUCCESS");
             return (data.Contents,true);
         } catch (error) {
-            console.error('Error fetching all files:', error);
+            print(`Error fetching all files: ${error}`, "ERROR");
             return(error,false)
         }
     }
@@ -64,9 +65,10 @@ class AWSFileManager {
             };
 
             const data = await s3.getObject(params).promise();
+            print(`fetch file by id`, "SUCCESS");
             return (data.Body,true);
         } catch (error) {
-            console.error('Error fetching file by Id:', error);
+            print(`fetch file by id: ${error}`, "ERROR");
             return(error,false)
         }
     }
@@ -74,10 +76,11 @@ class AWSFileManager {
     static async viewFile(fileId) {
         try {
             const fileContent = await this.getFileById(fileId);
-            console.log('File Content:', fileContent.toString());
+            print(`File Content: ${fileContent.toString()}`,'SUCCESS');
+            print(`view file by id`, "SUCCESS");
             return (fileContent,true);
         } catch (error) {
-            console.error('Error viewing file:', error);
+            print(`view file by id: ${error}`, "ERROR");
             return(error,false)
         }
     }
@@ -90,10 +93,10 @@ class AWSFileManager {
             };
 
             const data = await s3.deleteObject(params).promise();
-            console.log('File deleted successfully:', fileId);
+            print(`delete file By id : ${fileId}`, 'SUCCESS');
             return(data,true)
         } catch (error) {
-            console.error('Error deleting file:', error);
+            print(`delete file By id : ${fileId} : ${error}`, "ERROR");
             return(error,false)
         }
     }

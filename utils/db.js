@@ -1,6 +1,7 @@
 
 const { Sequelize } = require('sequelize');
 const {dbConfig} = require("../config")
+const print = require("./print")
 
 const sequelize = new Sequelize(dbConfig.development);
 
@@ -9,10 +10,10 @@ const setupDB = () => {
     sequelize
     .authenticate()
     .then(() => {
-      console.log('Database connected successfully.');
+      print('database connected successfully',"SUCCESS");
     })
     .catch((error) => {
-      console.error('Unable to connect to the database:', error);
+      print(`Unable to connect to the database: ${error}`, "ERROR");
     });
 }
 
