@@ -11,18 +11,16 @@
     "http"
   ],
   "paths": {
-    "/check": {
+    "/travel/": {
       "get": {
         "description": "",
         "responses": {
-          "200": {
-            "description": "OK"
+          "default": {
+            "description": ""
           }
         }
-      }
-    },
-    "/travel/all": {
-      "get": {
+      },
+      "post": {
         "description": "",
         "responses": {
           "default": {
@@ -74,16 +72,6 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/travel/new": {
-      "post": {
-        "description": "",
         "responses": {
           "default": {
             "description": ""

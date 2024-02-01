@@ -1,8 +1,8 @@
-const {Response,print} = require('../utils'); // Adjust the path accordingly
+const {Response,print} = require('../utils'); 
 // const {Travel} = require("../models")
 const db = require("../models");
 
-// const Travel = ;
+const Travel = db.Travel
 
 class TravelController {
     getAllRequisitions = async (req, res, next) => {
