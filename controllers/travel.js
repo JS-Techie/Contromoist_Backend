@@ -7,11 +7,6 @@ const db = require('../models');
 const {
     project
 } = require('../services');
-
-const {
-    Travel,
-    TravelDetails
-} = db;
 const {
     Sequelize
 } = require('sequelize');

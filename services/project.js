@@ -226,7 +226,6 @@ class Project {
         }
     };
 
-
     async resourceAssignedToProject(project, resource) {
         try {
             const assigned = await ProjectResource.findOne({
