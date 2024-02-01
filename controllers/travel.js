@@ -7,7 +7,11 @@ class TravelController {
     getAllRequisitions = async (req, res, next) => {
         try {
             // Need to know how to check the user type
-            const isAdmin = req.user && req.user.type === 'admin';
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+
+            const isAdmin = req.user && req.user.isAdmin;
 
             let requisitions;
 
@@ -40,13 +44,17 @@ class TravelController {
 
     getRequisitionById = async (req, res, next) => {
         try {
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+
             const requisitionId = req.params.id;
 
             if (!requisitionId) {
                 return Response.errorGeneric([], "Requisition ID Empty", "This requsition ID doesn't exist / is invalid!")(res)
             }
             // Need to know how to check the user type
-            const isAdmin = req.user && req.user.type === 'admin';
+            const isAdmin = req.user && req.user.isAdmin;
             let requisition;
 
             if (isAdmin) {
@@ -67,7 +75,7 @@ class TravelController {
                 return Response.errorNotFound()(res);
             }
 
-            print("REQUSITION FETCHED", logType.success)
+            print("REQUISITION FETCHED", logType.success)
 
 
             return Response.successFetch(requisition)(res);
@@ -80,13 +88,35 @@ class TravelController {
 
     getRequisitionByProjectId = async (req, res, next) => {
         try {
-            const projectId = req.params.project;
-            const requisitions = await Travel.find({ projectId, userId: req.userId });
+            const { project } = req.params;
+
+            // Check if the user is unauthorized
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+
+            // Check if the user is an admin
+            const isAdmin = req.user.isAdmin;
+
+            // Fetch requisitions based on the project ID and user ID (admin fetches all)
+            const requisitions = isAdmin
+                ? await Travel.find({ project })
+                : await Travel.find({ project, resource: req.user.id });
+
+            // Check if requisitions are empty
+            if (!requisitions || requisitions.length === 0) {
+                print("REQUISITIONS FETCHED BUT EMPTY BY PROJECT ID", logType.warning)
+                return Response.errorNotFound()(res);
+            }
+            print("REQUISITIONS FETCHED", logType.success)
             return Response.successFetch(requisitions)(res);
         } catch (error) {
+            print(str(error), logType.error)
             return Response.errorGeneric([], error.message)(res);
         }
-    }
+    };
+
+
 
     createRequisition = async (req, res, next) => {
         try {
