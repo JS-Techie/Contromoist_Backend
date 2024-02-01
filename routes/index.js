@@ -6,9 +6,9 @@ const swaggerUI = require("swagger-ui-express");
 const travelRouter = require("./travel")
 
 const setupRoutes = (app) => {
-
-    app.use("/travel",travelRouter)
     app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(endPoint));
+    app.use("/travel",travelRouter)
+    
 }
 
 

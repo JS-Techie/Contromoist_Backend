@@ -3,3 +3,4 @@ node_modules
 makefile
 test.js
 .prod.env
+docs/logs

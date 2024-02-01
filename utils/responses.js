@@ -1,5 +1,5 @@
 class Response {
-    static errorGeneric(data = [], devMessage, clientMessage = "Something went wrong, please try again in sometime!") {
+    errorGeneric(data = [], devMessage, clientMessage = "Something went wrong, please try again in sometime!") {
         return (res) => {
             return res.status(500).send({
                 success: false,
@@ -10,7 +10,7 @@ class Response {
         };
     }
 
-    static errorCustom(data = [], devMessage, clientMessage) {
+    errorCustom(data = [], devMessage, clientMessage) {
         return (res) => {
             return res.status(500).send({
                 success: false,
@@ -21,7 +21,7 @@ class Response {
         };
     }
 
-    static errorNotFound(data = [], devMessage, clientMessage = "The requested resource was not found on the server!") {
+    errorNotFound(data = [], devMessage, clientMessage = "The requested resource was not found on the server!") {
         return (res) => {
             return res.status(404).send({
                 success: false,
@@ -32,7 +32,7 @@ class Response {
         };
     }
 
-    static successFetch(data = [], devMessage = "Data fetched successfully", clientMessage = "The requested resource was fetched successfully") {
+    successFetch(data = [], devMessage = "Data fetched successfully", clientMessage = "The requested resource was fetched successfully") {
         return (res) => {
             return res.status(200).send({
                 success: true,
@@ -43,7 +43,7 @@ class Response {
         };
     }
 
-    static successCreate(data = [], devMessage = "Data created successfully", clientMessage = "The requested resource was created successfully") {
+    successCreate(data = [], devMessage = "Data created successfully", clientMessage = "The requested resource was created successfully") {
         return (res) => {
             return res.status(201).send({
                 success: true,
@@ -54,7 +54,7 @@ class Response {
         };
     }
 
-    static editSuccess(data = [], devMessage = "Data updated successfully", clientMessage = "The requested resource was updated successfully") {
+    editSuccess(data = [], devMessage = "Data updated successfully", clientMessage = "The requested resource was updated successfully") {
         return (res) => {
             return res.status(200).send({
                 success: true,
@@ -65,7 +65,7 @@ class Response {
         };
     }
 
-    static deleteSuccess(data = [], devMessage = "Data deleted successfully", clientMessage = "The requested resource was deleted successfully") {
+    deleteSuccess(data = [], devMessage = "Data deleted successfully", clientMessage = "The requested resource was deleted successfully") {
         return (res) => {
             return res.status(200).send({
                 success: true,
@@ -76,7 +76,7 @@ class Response {
         };
     }
 
-    static validationError(data = []) {
+    validationError(data = []) {
         return (res) => {
             return res.status(400).send({
                 success: false,
@@ -87,7 +87,7 @@ class Response {
         };
     }
 
-    static errorUnauthorized(data = []) {
+    errorUnauthorized(data = []) {
         return (res) => {
             return res.status(401).send({
                 success: false,
@@ -98,7 +98,7 @@ class Response {
         };
     }
 
-    static errorForbidden(data =[]) {
+    errorForbidden(data = []) {
         return (res) => {
             return res.status(403).send({
                 success: false,
@@ -109,7 +109,7 @@ class Response {
         };
     }
 
-    static errorServer(data = [], devMessage = "Internal server error", clientMessage = "An unexpected error occurred") {
+    errorServer(data = [], devMessage = "Internal server error", clientMessage = "An unexpected error occurred") {
         return (res) => {
             return res.status(500).send({
                 success: false,
