@@ -5,7 +5,7 @@ const {
 } = require('../utils');
 const db = require('../models');
 const {
-    Project
+    project
 } = require('../services');
 
 const {
@@ -16,7 +16,7 @@ const {
     Sequelize
 } = require('sequelize');
 
-const projectService = new Project();
+const projectService = project;
 
 class TravelController {
 
