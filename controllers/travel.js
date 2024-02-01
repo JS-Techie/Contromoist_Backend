@@ -1,4 +1,4 @@
-const Response = require('../utils'); // Adjust the path accordingly
+const {Response,print} = require('../utils'); // Adjust the path accordingly
 // const {Travel} = require("../models")
 const db = require("../models");
 
@@ -9,6 +9,8 @@ class TravelController {
         try {
             const requisitions = await Travel.find({ userId: req.userId });
             return Response.successFetch(requisitions)(res);
+
+            
         } catch (error) {
             return Response.errorGeneric([], error.message)(res);
         }
@@ -26,6 +28,7 @@ class TravelController {
             return Response.successFetch(requisition)(res);
         } catch (error) {
             return Response.errorGeneric([], error.message)(res);
+         
         }
     }
 

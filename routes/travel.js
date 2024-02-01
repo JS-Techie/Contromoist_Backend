@@ -11,6 +11,4 @@ travelRouter.route("/:id").delete(travelController.deleteRequisition)
 travelRouter.route("/:project").get(travelController.getRequisitionByProjectId)
 
 
-
-
 module.exports = travelRouter
