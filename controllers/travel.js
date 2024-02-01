@@ -1,5 +1,4 @@
-const {Response,print} = require('../utils'); 
-// const {Travel} = require("../models")
+const { Response, print,logType } = require('../utils');
 const db = require("../models");
 
 const Travel = db.Travel
@@ -7,14 +6,37 @@ const Travel = db.Travel
 class TravelController {
     getAllRequisitions = async (req, res, next) => {
         try {
-            const requisitions = await Travel.find({ userId: req.userId });
-            return Response.successFetch(requisitions)(res);
-
+            // Need to know how to check the user type
+            const isAdmin = req.user && req.user.type === 'admin';
+    
+            let requisitions;
+    
+            if (isAdmin) {
+                // Fetch all requisitions for admin
+                requisitions = await Travel.find();
+            } else {
+                // Fetch requisitions based on the query for non-admin users
+                if (!req.user.id) {
+                    return Response.errorUnauthorized()(res);
+                }
+    
+                requisitions = await Travel.find({ resource: req.user.id });
+            }
             
+            // Check if requisitions are empty
+            if (!requisitions || requisitions.length === 0) {
+                print("REQUSITIONS FETCHED BUT EMPTY",logType.warning)
+                return Response.errorNotFound()(res);
+            }
+            
+            print("REQUSITIONS FETCHED",logType.success)
+
+            return Response.successFetch(requisitions)(res);
         } catch (error) {
+            print(str(error),logType.error)
             return Response.errorGeneric([], error.message)(res);
         }
-    }
+    };
 
     getRequisitionById = async (req, res, next) => {
         try {
@@ -28,7 +50,7 @@ class TravelController {
             return Response.successFetch(requisition)(res);
         } catch (error) {
             return Response.errorGeneric([], error.message)(res);
-         
+
         }
     }
 
