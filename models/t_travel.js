@@ -1,7 +1,7 @@
 const {
   DataTypes
 } = require('sequelize');
-module.exports = (sequelize,DataTypes) => {
+module.exports = sequelize => {
   const attributes = {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -38,36 +38,23 @@ module.exports = (sequelize,DataTypes) => {
         model: "users_model"
       }
     },
-    location: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "location",
-      references: {
-        key: "id",
-        model: "city_model"
-      }
-    },
-    reason: {
+    name: {
       type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "reason"
+      field: "name"
     },
-    amount: {
-      type: DataTypes.DECIMAL,
+    desc: {
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "amount"
+      field: "desc"
     },
     is_approved: {
       type: DataTypes.INTEGER(1),
@@ -78,18 +65,58 @@ module.exports = (sequelize,DataTypes) => {
       comment: null,
       field: "is_approved"
     },
-    approved_by: {
+    created_by: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "approved_by",
+      field: "created_by",
       references: {
         key: "id",
         model: "users_model"
       }
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: sequelize.fn('current_timestamp'),
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "created_at"
+    },
+    updated_by: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "updated_by",
+      references: {
+        key: "id",
+        model: "users_model"
+      }
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "updated_at"
+    },
+    is_active: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: "1",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_active"
     }
   };
   const options = {
@@ -106,15 +133,15 @@ module.exports = (sequelize,DataTypes) => {
       type: "BTREE",
       fields: ["resource"]
     }, {
-      name: "location",
+      name: "created_by",
       unique: false,
       type: "BTREE",
-      fields: ["location"]
+      fields: ["created_by"]
     }, {
-      name: "approved_by",
+      name: "updated_by",
       unique: false,
       type: "BTREE",
-      fields: ["approved_by"]
+      fields: ["updated_by"]
     }]
   };
   const TTravelModel = sequelize.define("t_travel_model", attributes, options);

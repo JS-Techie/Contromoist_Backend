@@ -30,6 +30,19 @@ module.exports = sequelize => {
       comment: null,
       field: "desc"
     },
+    department: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "department",
+      references: {
+        key: "id",
+        model: "departments_model"
+      }
+    },
     completion: {
       type: DataTypes.BIGINT,
       allowNull: true,
@@ -118,12 +131,70 @@ module.exports = sequelize => {
         key: "id",
         model: "t_reason_model"
       }
+    },
+    created_by: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "created_by",
+      references: {
+        key: "id",
+        model: "users_model"
+      }
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: sequelize.fn('current_timestamp'),
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "created_at"
+    },
+    updated_by: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "updated_by",
+      references: {
+        key: "id",
+        model: "users_model"
+      }
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "updated_at"
+    },
+    is_active: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: "1",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_active"
     }
   };
   const options = {
     tableName: "t_task",
     comment: "",
     indexes: [{
+      name: "department",
+      unique: false,
+      type: "BTREE",
+      fields: ["department"]
+    }, {
       name: "assigned_to",
       unique: false,
       type: "BTREE",
@@ -133,6 +204,16 @@ module.exports = sequelize => {
       unique: false,
       type: "BTREE",
       fields: ["reason"]
+    }, {
+      name: "created_by",
+      unique: false,
+      type: "BTREE",
+      fields: ["created_by"]
+    }, {
+      name: "updated_by",
+      unique: false,
+      type: "BTREE",
+      fields: ["updated_by"]
     }]
   };
   const TTaskModel = sequelize.define("t_task_model", attributes, options);

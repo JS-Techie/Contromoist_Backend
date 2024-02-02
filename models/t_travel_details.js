@@ -12,32 +12,71 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    type: {
+    location: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "location",
+      references: {
+        key: "id",
+        model: "city_model"
+      }
+    },
+    travel_id: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "travel_id",
+      references: {
+        key: "id",
+        model: "t_travel_model"
+      }
+    },
+    reason: {
       type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "type"
+      field: "reason"
     },
-    desc: {
-      type: DataTypes.STRING(255),
+    amount: {
+      type: DataTypes.DECIMAL,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "desc"
+      field: "amount"
     },
-    alert_type: {
+    is_approved: {
       type: DataTypes.INTEGER(1),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "alert_type"
+      field: "is_approved"
+    },
+    approved_by: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "approved_by",
+      references: {
+        key: "id",
+        model: "users_model"
+      }
     },
     created_by: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -94,9 +133,24 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_project_status",
+    tableName: "t_travel_details",
     comment: "",
     indexes: [{
+      name: "location",
+      unique: false,
+      type: "BTREE",
+      fields: ["location"]
+    }, {
+      name: "travel_id",
+      unique: false,
+      type: "BTREE",
+      fields: ["travel_id"]
+    }, {
+      name: "approved_by",
+      unique: false,
+      type: "BTREE",
+      fields: ["approved_by"]
+    }, {
       name: "created_by",
       unique: false,
       type: "BTREE",
@@ -108,6 +162,6 @@ module.exports = sequelize => {
       fields: ["updated_by"]
     }]
   };
-  const TProjectStatusModel = sequelize.define("t_project_status_model", attributes, options);
-  return TProjectStatusModel;
+  const TTravelDetailsModel = sequelize.define("t_travel_details_model", attributes, options);
+  return TTravelDetailsModel;
 };

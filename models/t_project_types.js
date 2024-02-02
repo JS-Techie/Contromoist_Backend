@@ -12,32 +12,14 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    type: {
+    name: {
       type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "type"
-    },
-    desc: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "desc"
-    },
-    alert_type: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "alert_type"
+      field: "name"
     },
     created_by: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -46,11 +28,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by",
-      references: {
-        key: "id",
-        model: "users_model"
-      }
+      field: "created_by"
     },
     created_at: {
       type: DataTypes.DATE,
@@ -68,11 +46,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by",
-      references: {
-        key: "id",
-        model: "users_model"
-      }
+      field: "updated_by"
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -94,20 +68,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_project_status",
+    tableName: "t_project_types",
     comment: "",
-    indexes: [{
-      name: "created_by",
-      unique: false,
-      type: "BTREE",
-      fields: ["created_by"]
-    }, {
-      name: "updated_by",
-      unique: false,
-      type: "BTREE",
-      fields: ["updated_by"]
-    }]
+    indexes: []
   };
-  const TProjectStatusModel = sequelize.define("t_project_status_model", attributes, options);
-  return TProjectStatusModel;
+  const TProjectTypesModel = sequelize.define("t_project_types_model", attributes, options);
+  return TProjectTypesModel;
 };
