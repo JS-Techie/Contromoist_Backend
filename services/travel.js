@@ -10,7 +10,7 @@ const {
     TravelDetails
 } = db;
 
-class Project {
+class TravelService {
 
     async fetchAll(resource, isAdmin) {
         try {
@@ -167,6 +167,7 @@ class Project {
             return (recordIds, true);
 
         } catch (error) {
+            await transaction.rollback();
             print(String(error), logType.error);
             return (String(error), false);
         }
@@ -246,4 +247,4 @@ class Project {
     }
 }
 
-module.exports = new Project();
+module.exports = new TravelService();

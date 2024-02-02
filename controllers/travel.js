@@ -5,13 +5,12 @@ const {
 } = require('../utils');
 const db = require('../models');
 const {
-    project
+    travelService
 } = require('../services');
 const {
     Sequelize
 } = require('sequelize');
 
-const projectService = project;
 
 class TravelController {
 
@@ -23,7 +22,7 @@ class TravelController {
 
             const isAdmin = req.user.isAdmin;
 
-            const [data, ok] = await projectService.fetchAll(req.user.id, isAdmin)
+            const [data, ok] = await travelService.fetchAll(req.user.id, isAdmin)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -51,7 +50,7 @@ class TravelController {
 
             const isAdmin = req.user.isAdmin;
 
-            const [data, ok] = await projectService.fetchById(requisitionId, req.user.id, isAdmin)
+            const [data, ok] = await travelService.fetchById(requisitionId, req.user.id, isAdmin)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -76,7 +75,7 @@ class TravelController {
 
             const isAdmin = req.user.isAdmin;
 
-            const [data, ok] = await projectService.fetchByProjectId(req.user.id, project, isAdmin)
+            const [data, ok] = await travelService.fetchByProjectId(req.user.id, project, isAdmin)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -106,14 +105,14 @@ class TravelController {
                 return Response.errorGeneric([], 'Valid project ID not present', 'Please select a project to enter a new requisition!')(res);
             }
 
-            const resourceAssignedToProject = await projectService.resourceAssignedToProject();
+            const resourceAssignedToProject = await travelService.resourceAssignedToProject();
 
             if (!resourceAssignedToProject) {
                 print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
                 return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
             }
 
-            const [data, ok] = await projectService.createRequisition(project, details, req.user.id)
+            const [data, ok] = await travelService.createRequisition(project, details, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -141,7 +140,7 @@ class TravelController {
                 return Response.errorGeneric([], 'Requisition ID Empty', 'This requisition ID doesn\'t exist or is invalid!')(res);
             }
 
-            const requisition = await projectService.fetchById(requisitionId, req.user.id, req.user.isAdmin)
+            const requisition = await travelService.fetchById(requisitionId, req.user.id, req.user.isAdmin)
             if (!requisition) {
                 print('REQUISITION FETCHED BUT EMPTY', logType.warning);
                 return Response.errorNotFound()(res);
@@ -156,7 +155,7 @@ class TravelController {
                 return Response.errorGeneric([], 'Valid project ID not present', 'Please select a project to edit the requisition!')(res);
             }
 
-            const resourceAssignedToProject = await projectService.resourceAssignedToProject();
+            const resourceAssignedToProject = await travelService.resourceAssignedToProject();
 
             if (!resourceAssignedToProject) {
                 print(`USER ${req.user.id} WANTED TO EDIT REQUISITION BUT UNAUTHORIZED`, logType.error);
@@ -167,7 +166,7 @@ class TravelController {
                 return Response.errorGeneric([], 'Details array is required and should not be empty', 'Please provide valid details for editing the requisition!')(res);
             }
 
-            const [data, ok] = await projectService.editRequisition(requisitionId, req.user.id, details, project)
+            const [data, ok] = await travelService.editRequisition(requisitionId, req.user.id, details, project)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -190,7 +189,7 @@ class TravelController {
         try {
             const requisitionId = req.params.id;
 
-            const [deletedRequisition, ok] = await projectService.deleteRequisition(requisitionId);
+            const [deletedRequisition, ok] = await travelService.deleteRequisition(requisitionId);
 
             if (!ok) {
                 await transaction.rollback();

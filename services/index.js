@@ -1,5 +1,5 @@
-const project = require("./project")
+const travelService = require("./travel")
 
 module.exports = {
-    project
+    travelService
 }
