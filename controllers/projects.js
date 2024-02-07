@@ -72,6 +72,14 @@ class ProjectController {
             
 
             const projectDetails = req.body
+
+            const[data,ok] = await projectService.create(projectDetails)
+
+            if (!ok){
+                return Response.errorGeneric(data)(res)
+            }
+
+            
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);

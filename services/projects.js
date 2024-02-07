@@ -40,7 +40,7 @@ class ProjectService {
             attributes: ["id", "name", "type"],
           },
         ],
-        // where: isAdmin ? {} : { "$project_resources.resource$": resource },
+        where:{is_active : true}
       });
 
       if (!projects || projects.length === 0) {
@@ -96,6 +96,7 @@ class ProjectService {
             attributes: ["id", "name", "type"],
           },
         ],
+        where:{is_active : true}
       });
 
       if (!project) {
@@ -120,45 +121,6 @@ class ProjectService {
         transaction,
       });
 
-      // Extract necessary details
-      const { tasks, files, resourceAssignments } = projectDetails;
-
-      // Create task entries associated with the project
-      if (tasks && tasks.length > 0) {
-        const taskRecords = tasks.map((task) => ({
-          project: createdProject.id,
-          ...task,
-        }));
-
-        await ProjectTaskModel.bulkCreate(taskRecords, {
-          transaction,
-        });
-      }
-
-      // Create file entries associated with the project
-      if (files && files.length > 0) {
-        const fileRecords = files.map((file) => ({
-          project: createdProject.id,
-          ...file,
-        }));
-
-        await ProjectFileModel.bulkCreate(fileRecords, {
-          transaction,
-        });
-      }
-
-      // Assign resources to the project
-      if (resourceAssignments && resourceAssignments.length > 0) {
-        const resourceRecords = resourceAssignments.map((resource) => ({
-          project: createdProject.id,
-          ...resource,
-        }));
-
-        await ProjectResourceModel.bulkCreate(resourceRecords, {
-          transaction,
-        });
-      }
-
       await transaction.commit();
 
       print(`PROJECT CREATED: ${createdProject.id}`, logType.success);
@@ -174,62 +136,6 @@ class ProjectService {
     const transaction = await db.sequelize.transaction();
 
     try {
-      // Update the main project entry
-      await ProjectModel.update(projectDetails, {
-        where: { id: projectId },
-        transaction,
-      });
-
-      // Extract necessary details
-      const { tasks, files, resourceAssignments } = projectDetails;
-
-      // Update or create task entries associated with the project
-      if (tasks && tasks.length > 0) {
-        const taskRecords = tasks.map((task) => ({
-          project: projectId,
-          ...task,
-        }));
-
-        await ProjectTaskModel.bulkCreate(taskRecords, {
-          updateOnDuplicate: [
-            "title",
-            "desc",
-            "est_start",
-            "est_end",
-            "actual_start",
-            "actual_end",
-            "duration",
-            "critical",
-          ],
-          transaction,
-        });
-      }
-
-      // Update or create file entries associated with the project
-      if (files && files.length > 0) {
-        const fileRecords = files.map((file) => ({
-          project: projectId,
-          ...file,
-        }));
-
-        await ProjectFileModel.bulkCreate(fileRecords, {
-          updateOnDuplicate: ["name", "type"],
-          transaction,
-        });
-      }
-
-      // Update or create resource assignments for the project
-      if (resourceAssignments && resourceAssignments.length > 0) {
-        const resourceRecords = resourceAssignments.map((resource) => ({
-          project: projectId,
-          ...resource,
-        }));
-
-        await ProjectResourceModel.bulkCreate(resourceRecords, {
-          updateOnDuplicate: ["resource"],
-          transaction,
-        });
-      }
 
       await transaction.commit();
 
