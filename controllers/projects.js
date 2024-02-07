@@ -49,7 +49,6 @@ class ProjectController {
 
             const isAdmin = req.user.isAdmin;
 
-            // Implement the logic to fetch a project by ID using projectService
             const [data, ok] = await projectService.fetchById(projectId, req.user.id, isAdmin)
 
             if (!ok) {
@@ -64,15 +63,52 @@ class ProjectController {
     }
 
     async create(req, res, next) {
-        // Implement the logic to create a new project similar to createRequisition in TravelController
+        const transaction = await db.sequelize.transaction();
+
+        try {
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+            
+
+            const projectDetails = req.body
+        } catch (error) {
+            await transaction.rollback();
+            print(String(error), logType.error);
+            return Response.errorGeneric([], error.message)(res);
+        }
     }
 
     async edit(req, res, next) {
-        // Implement the logic to edit a project similar to editRequisition in TravelController
+       const transaction = await db.sequelize.transaction();
+
+        try {
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+            
+            
+        } catch (error) {
+            await transaction.rollback();
+            print(String(error), logType.error);
+            return Response.errorGeneric([], error.message)(res);
+        }
     }
 
     async delete(req, res, next) {
-        // Implement the logic to delete a project similar to deleteRequisition in TravelController
+        const transaction = await db.sequelize.transaction();
+
+        try {
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+            
+            
+        } catch (error) {
+            await transaction.rollback();
+            print(String(error), logType.error);
+            return Response.errorGeneric([], error.message)(res);
+        }
     }
 }
 

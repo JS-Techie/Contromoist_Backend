@@ -4,8 +4,6 @@ const db = require("../models");
 const {
   ProjectModel,
   ProjectResourceModel,
-  DepartmentModel,
-
   ProjectTaskModel,
   ProjectFileModel,
   TaskTemplateModel,
@@ -24,17 +22,9 @@ class ProjectService {
             where: isAdmin ? {} : { resource },
           },
           {
-            model: DepartmentModel,
-            attributes: ["name"],
-          },
-          {
             model: ProjectTaskModel,
             attributes: ["id", "title", "desc", "est_start", "est_end", "actual_start", "actual_end", "duration", "critical"],
             include: [
-              {
-                model: TaskTemplateModel,
-                attributes: ["id", "type", "name", "delay"],
-              },
               {
                 model: TaskDependenceModel,
                 attributes: ["id"],
@@ -50,7 +40,7 @@ class ProjectService {
             attributes: ["id", "name", "type"],
           },
         ],
-        where: isAdmin ? {} : { "$project_resources.resource$": resource },
+        // where: isAdmin ? {} : { "$project_resources.resource$": resource },
       });
 
       if (!projects || projects.length === 0) {
@@ -67,21 +57,22 @@ class ProjectService {
   }
 
   async fetchById(projectId, isAdmin, resource) {
+
     try {
       const project = await ProjectModel.findOne({
-        where: isAdmin
-          ? { id: projectId }
-          : { id: projectId, "$project_resources.resource$": resource },
+        // where: isAdmin
+        //   ? { id: projectId }
+        //   : { id: projectId, "$project_resources.resource$": resource },
         include: [
           {
             model: ProjectResourceModel,
             attributes: [],
             where: isAdmin ? {} : { resource },
           },
-          {
-            model: DepartmentModel,
-            attributes: ["name"],
-          },
+        //   {
+        //     model: DepartmentModel,
+        //     attributes: ["name"],
+        //   },
           {
             model: ProjectTaskModel,
             attributes: ["id", "title", "desc", "est_start", "est_end", "actual_start", "actual_end", "duration", "critical"],
