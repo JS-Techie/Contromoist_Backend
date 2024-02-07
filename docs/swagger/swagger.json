@@ -11,7 +11,7 @@
     "http"
   ],
   "paths": {
-    "/travel/": {
+    "/api/travel/": {
       "get": {
         "description": "",
         "responses": {
@@ -46,7 +46,7 @@
         }
       }
     },
-    "/travel/{id}": {
+    "/api/travel/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -111,7 +111,7 @@
         }
       }
     },
-    "/travel/{project}": {
+    "/api/travel/{project}": {
       "get": {
         "description": "",
         "parameters": [
@@ -122,6 +122,94 @@
             "type": "string"
           }
         ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/project/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/project/{id}": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/template/project/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/template/project/{id}": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "description": "",
         "responses": {
           "default": {
             "description": ""

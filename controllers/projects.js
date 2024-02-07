@@ -5,7 +5,8 @@ const {
 } = require('../utils');
 const db = require('../models');
 const {
-    projectService
+    projectService,
+    travelService
 } = require('../services');
 const {
     Sequelize
@@ -49,6 +50,12 @@ class ProjectController {
 
             const isAdmin = req.user.isAdmin;
 
+            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+
+            if (!resourceAssignedToProject) {
+                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
+                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
+            }
             const [data, ok] = await projectService.fetchById(projectId, req.user.id, isAdmin)
 
             if (!ok) {
@@ -95,6 +102,12 @@ class ProjectController {
                 return Response.errorUnauthorized()(res);
             }
             
+            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+
+            if (!resourceAssignedToProject) {
+                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
+                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
+            }
             
         } catch (error) {
             await transaction.rollback();
@@ -110,6 +123,13 @@ class ProjectController {
             if (!req.user || !req.user.id) {
                 return Response.errorUnauthorized()(res);
             }
+
+            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+
+            if (!resourceAssignedToProject) {
+                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
+                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
+            }
             
             
         } catch (error) {
@@ -118,6 +138,7 @@ class ProjectController {
             return Response.errorGeneric([], error.message)(res);
         }
     }
+
 }
 
 module.exports = new ProjectController();

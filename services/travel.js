@@ -227,24 +227,6 @@ class TravelService {
         }
     };
 
-    async resourceAssignedToProject(project, resource) {
-        try {
-            const assigned = await ProjectResource.findOne({
-                project,
-                resource
-            });
-
-            if (!assigned) {
-                print(`USER ${resource} IS NOT ASSIGNED TO PROJECT ${project}`, logType.warning);
-                return (false, true);
-            }
-            return (true, true);
-
-        } catch (error) {
-            print(String(error), logType.error);
-            return (String(error), false);
-        }
-    }
 }
 
 module.exports = new TravelService();

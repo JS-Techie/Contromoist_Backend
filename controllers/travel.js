@@ -5,7 +5,8 @@ const {
 } = require('../utils');
 const db = require('../models');
 const {
-    travelService
+    travelService,
+    projectService
 } = require('../services');
 const {
     Sequelize
@@ -105,7 +106,7 @@ class TravelController {
                 return Response.errorGeneric([], 'Valid project ID not present', 'Please select a project to enter a new requisition!')(res);
             }
 
-            const resourceAssignedToProject = await travelService.resourceAssignedToProject();
+            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
 
             if (!resourceAssignedToProject) {
                 print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
@@ -155,10 +156,10 @@ class TravelController {
                 return Response.errorGeneric([], 'Valid project ID not present', 'Please select a project to edit the requisition!')(res);
             }
 
-            const resourceAssignedToProject = await travelService.resourceAssignedToProject();
+            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
 
             if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO EDIT REQUISITION BUT UNAUTHORIZED`, logType.error);
+                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
                 return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
             }
 
@@ -187,6 +188,18 @@ class TravelController {
         const transaction = await db.sequelize.transaction();
 
         try {
+
+            if (!req.user || !req.user.id) {
+                return Response.errorUnauthorized()(res);
+            }
+
+            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+
+            if (!resourceAssignedToProject) {
+                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
+                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
+            }
+
             const requisitionId = req.params.id;
 
             const [deletedRequisition, ok] = await travelService.deleteRequisition(requisitionId);
