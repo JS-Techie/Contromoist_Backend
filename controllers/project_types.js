@@ -5,14 +5,13 @@ const {
 } = require('../utils');
 const db = require('../models');
 const {
-    projectService,
-    travelService
+    projectTypeService
 } = require('../services');
 const {
     Sequelize
 } = require('sequelize');
 
-class ProjectController {
+class ProjectTypeController {
 
     async fetchAll(req, res, next) {
         try {
@@ -20,9 +19,7 @@ class ProjectController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const isAdmin = req.user.isAdmin;
-
-            const [data, ok] = await projectService.fetchAll(req.user.id, isAdmin)
+            const [data, ok] = await projectTypeService.fetchAll()
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -42,21 +39,13 @@ class ProjectController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const projectId = req.params.id;
+            const projectTypeId = req.params.id;
 
-            if (!projectId) {
-                return Response.errorGeneric([], 'Project ID Empty', 'This project ID doesn\'t exist or is invalid!')(res);
+            if (!projectTypeId) {
+                return Response.errorGeneric([], 'Project ID Empty', 'This project Type ID doesn\'t exist or is invalid!')(res);
             }
 
-            const isAdmin = req.user.isAdmin;
-
-            const [error , resourceAssignedToProject] = await projectService.resourceAssignedToProject(projectId,req.user.id, req.user.isAdmin);
-
-            if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO VIEW NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
-                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
-            }
-            const [data, ok] = await projectService.fetchById(projectId, req.user.id, isAdmin)
+            const [data, ok] = await projectTypeService.fetchById(projectTypeId)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -76,17 +65,23 @@ class ProjectController {
             if (!req.user || !req.user.id) {
                 return Response.errorUnauthorized()(res);
             }
-            
 
-            const projectDetails = req.body
+            const [error , resourceAssignedToProject] = await projectTypeService.resourceAssignedToProject(projectId, req.user.id, isAdmin);
 
-            const[data,ok] = await projectService.create(projectDetails)
+            if (!resourceAssignedToProject) {
+                print(`USER ${req.user.id} WANTED TO CREATE NEW PROJECT TYPE BUT UNAUTHORIZED`, logType.error);
+                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
+            }
 
-            if (!ok){
+            const projectTypeDetails = req.body
+
+            const [data, ok] = await projectTypeService.create(projectTypeDetails)
+
+            if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
 
-            
+
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
@@ -95,20 +90,29 @@ class ProjectController {
     }
 
     async edit(req, res, next) {
-       const transaction = await db.sequelize.transaction();
+        const transaction = await db.sequelize.transaction();
 
         try {
             if (!req.user || !req.user.id) {
                 return Response.errorUnauthorized()(res);
             }
-            
-            const [error , resourceAssignedToProject] = await projectService.resourceAssignedToProject(projectId,req.user.id);
+
+            const [error , resourceAssignedToProject] = await projectTypeService.resourceAssignedToProject(projectId, req.user.id, isAdmin);
 
             if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
+                print(`USER ${req.user.id} WANTED TO EDIT PROJECT TYPE BUT UNAUTHORIZED`, logType.error);
                 return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
             }
-            
+
+            const projectTypeDetails = req.body
+            const projectTypeId = req.params.id
+
+            const [data, ok] = await projectTypeService.edit(projectTypeId, projectTypeDetails)
+
+            if (!ok) {
+                return Response.errorGeneric(data)(res)
+            }
+
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
@@ -124,14 +128,21 @@ class ProjectController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const [error , resourceAssignedToProject] = await projectService.resourceAssignedToProject(projectId,req.user.id);
+            const [error , resourceAssignedToProject] = await projectTypeService.resourceAssignedToProject(projectId, req.user.id, isAdmin);
 
             if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
+                print(`USER ${req.user.id} WANTED TO DELETE A PROJECT TYPE BUT UNAUTHORIZED`, logType.error);
                 return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
             }
-            
-            
+
+            const projectTypeId = req.params.id
+
+            const [data, ok] = await projectTypeService.delete(projectTypeId)
+
+            if (!ok) {
+                return Response.errorGeneric(data)(res)
+            }
+
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
@@ -141,4 +152,4 @@ class ProjectController {
 
 }
 
-module.exports = new ProjectController();
+module.exports = new ProjectTypeController();
