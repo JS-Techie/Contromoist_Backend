@@ -2,42 +2,42 @@ const { print, logType } = require("../utils");
 const db = require("../models");
 
 const {
-  ProjectModel,
-  ProjectResourceModel,
-  ProjectTaskModel,
-  ProjectFileModel,
-  TaskTemplateModel,
-  TaskDependenceModel,
-  TaskRelationModel,
+  Project,
+  ProjectResource,
+  ProjectTask,
+  ProjectFile,
+  TaskTemplate,
+  TaskDependence,
+  TaskRelation,
 } = db;
 
 class ProjectService {
     
   async fetchAll(isAdmin, resource) {
     try {
-      const projects = await ProjectModel.findAll({
+      const projects = await Project.findAll({
         include: [
           {
-            model: ProjectResourceModel,
+            model: ProjectResource,
             attributes: [],
             where: isAdmin ? {} : { resource },
           },
           {
-            model: ProjectTaskModel,
+            model: ProjectTask,
             attributes: ["id", "title", "desc", "est_start", "est_end", "actual_start", "actual_end", "duration", "critical"],
             include: [
               {
-                model: TaskDependenceModel,
+                model: TaskDependence,
                 attributes: ["id"],
               },
               {
-                model: TaskRelationModel,
+                model: TaskRelation,
                 attributes: ["id"],
               },
             ],
           },
           {
-            model: ProjectFileModel,
+            model: ProjectFile,
             attributes: ["id", "name", "type"],
           },
         ],
@@ -60,40 +60,40 @@ class ProjectService {
   async fetchById(projectId, isAdmin, resource) {
 
     try {
-      const project = await ProjectModel.findOne({
+      const project = await Project.findOne({
         // where: isAdmin
         //   ? { id: projectId }
         //   : { id: projectId, "$project_resources.resource$": resource },
         include: [
           {
-            model: ProjectResourceModel,
+            model: ProjectResource,
             attributes: [],
             where: isAdmin ? {} : { resource },
           },
         //   {
-        //     model: DepartmentModel,
+        //     model: Department,
         //     attributes: ["name"],
         //   },
           {
-            model: ProjectTaskModel,
+            model: ProjectTask,
             attributes: ["id", "title", "desc", "est_start", "est_end", "actual_start", "actual_end", "duration", "critical"],
             include: [
               {
-                model: TaskTemplateModel,
+                model: TaskTemplate,
                 attributes: ["id", "type", "name", "delay"],
               },
               {
-                model: TaskDependenceModel,
+                model: TaskDependence,
                 attributes: ["id"],
               },
               {
-                model: TaskRelationModel,
+                model: TaskRelation,
                 attributes: ["id"],
               },
             ],
           },
           {
-            model: ProjectFileModel,
+            model: ProjectFile,
             attributes: ["id", "name", "type"],
           },
         ],
@@ -118,7 +118,7 @@ class ProjectService {
 
     try {
       // Create the main project entry
-      const createdProject = await ProjectModel.create(projectDetails, {
+      const createdProject = await Project.create(projectDetails, {
         transaction,
       });
 
@@ -154,7 +154,7 @@ class ProjectService {
 
     try {
       // Soft delete the main project entry
-      await ProjectModel.update(
+      await Project.update(
         { is_active: false },
         {
           where: { id: projectId },
@@ -163,7 +163,7 @@ class ProjectService {
       );
 
       // Soft delete associated task entries
-      await ProjectTaskModel.update(
+      await ProjectTask.update(
         { is_active: false },
         {
           where: { project: projectId },
@@ -172,7 +172,7 @@ class ProjectService {
       );
 
       // Soft delete associated file entries
-      await ProjectFileModel.update(
+      await ProjectFile.update(
         { is_active: false },
         {
           where: { project: projectId },
@@ -181,7 +181,7 @@ class ProjectService {
       );
 
       // Soft delete associated resource assignments
-      await ProjectResourceModel.update(
+      await ProjectResource.update(
         { is_active: false },
         {
           where: { project: projectId },
@@ -200,8 +200,13 @@ class ProjectService {
     }
   }
 
-  async resourceAssignedToProject(project, resource) {
+  async resourceAssignedToProject(project, resource, isAdmin) {
     try {
+
+        if (isAdmin){
+          return (true, true)
+        }
+
         const assigned = await ProjectResource.findOne({
             project,
             resource

@@ -106,7 +106,7 @@ class TravelController {
                 return Response.errorGeneric([], 'Valid project ID not present', 'Please select a project to enter a new requisition!')(res);
             }
 
-            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+            const [error , resourceAssignedToProject] = await projectService.resourceAssignedToProject(projectId, req.user.id, req.user.isAdmin);
 
             if (!resourceAssignedToProject) {
                 print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
@@ -156,7 +156,7 @@ class TravelController {
                 return Response.errorGeneric([], 'Valid project ID not present', 'Please select a project to edit the requisition!')(res);
             }
 
-            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+            const [error , resourceAssignedToProject] = await projectService.resourceAssignedToProject(projectId,req.user.id, req.user.isAdmin);
 
             if (!resourceAssignedToProject) {
                 print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
@@ -193,7 +193,7 @@ class TravelController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const resourceAssignedToProject = await projectService.resourceAssignedToProject(projectId,req.user.id);
+            const [error , resourceAssignedToProject] = await projectService.resourceAssignedToProject(projectId,req.user.id, req.user.isAdmin);
 
             if (!resourceAssignedToProject) {
                 print(`USER ${req.user.id} WANTED TO CREATE NEW REQUISITION BUT UNAUTHORIZED`, logType.error);
