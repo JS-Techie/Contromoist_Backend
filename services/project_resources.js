@@ -17,7 +17,7 @@ class ProjectResourceService {
                         model : Users,
                         attributes : ["name","phone","email_id"],
                         where : {
-                                id : db.Sequelize.col('t_project_resource.id')
+                                id : db.Sequelize.col('users.id')
                         }
                     },
                     {

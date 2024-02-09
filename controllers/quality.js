@@ -20,7 +20,9 @@ class QualityController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const [data, ok] = await qualityService.fetchAll()
+            const is_pre = req.query.is_pre == undefined ? null:req.query.is_pre
+
+            const [data, ok] = await qualityService.fetchAll(is_pre)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -64,12 +66,13 @@ class QualityController {
             const {
                 project
             } = req.params;
+            const is_pre = req.query.is_pre == undefined ? null:req.query.is_pre
 
             if (!req.user || !req.user.id) {
                 return Response.errorUnauthorized()(res);
             }
 
-            const [data, ok] = await qualityService.fetchByProjectId(project)
+            const [data, ok] = await qualityService.fetchByProjectId(project, is_pre)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -91,10 +94,11 @@ class QualityController {
             }
 
             const {
-                details
+                quality_template_id,
+                project_id
             } = req.body;
 
-            const [data, ok] = await qualityService.createTask(details, req.user.id)
+            const [data, ok] = await qualityService.createTask(quality_template_id, project_id, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -119,7 +123,7 @@ class QualityController {
             const taskId = req.params.id;
 
             if (!taskId) {
-                return Response.errorGeneric([], 'Task ID Empty', 'This requisition ID doesn\'t exist or is invalid!')(res);
+                return Response.errorGeneric([], 'Task ID Empty', 'This TASK ID doesn\'t exist or is invalid!')(res);
             }
 
             const task = await qualityService.fetchById(taskId)
@@ -159,7 +163,7 @@ class QualityController {
         try {
             const taskId = req.params.id;
 
-            const [deletedTask, ok] = await qualityService.deleteTask(taskId);
+            const [deletedTask, ok] = await qualityService.deleteTask(taskId, req.user.id);
 
             if (!ok) {
                 await transaction.rollback();

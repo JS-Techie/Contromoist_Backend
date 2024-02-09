@@ -4,16 +4,21 @@ const {
 } = require("../utils");
 const db = require("../models");
 
-const { 
+const {
+    QualityTemplateTask,
     QualityTemplate,
     Quality
 } = db;
 
 class QualityService {
 
-    async fetchAll() {
+    async fetchAll(is_pre) {
         try {
-            const tasks = await Quality.findAll();
+
+            const tasks = await Quality.findAll({
+                where: is_pre ? { is_pre } : {}
+            }
+            );
 
             if (!tasks || tasks.length === 0) {
                 print('TASKS FETCHED BUT EMPTY', logType.warning);
@@ -51,10 +56,14 @@ class QualityService {
         }
     }
 
-    async fetchByProjectId(project) {
+    async fetchByProjectId(project, is_pre) {
         try {
+
             const tasks = await Quality.findAll({
-                where: {
+                where: is_pre ? {
+                    project,
+                    is_pre
+                } : {
                     project
                 }
             });
@@ -72,17 +81,24 @@ class QualityService {
         }
     }
 
-    async createTask(details, resource) {
+    async createTask(quality_template_id, project_id, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
-            const qualityTaskRecords = details.map((detail) => ({
-                project: detail.project,
-                assigned_to: detail.assigned_to,
-                task: detail.task,
-                quality_template_id: detail.quality_template_id,
-                created_by: resource
-            }));
+
+            const templateDatas = await QualityTemplateTask.findAll({
+                where:{
+                    template_id: quality_template_id,
+                    is_active: true
+                }
+            })
+
+            const qualityTaskRecords = templateDatas.map((detail) => ({
+                    project: project_id,
+                    task: detail.task,
+                    is_pre: detail.is_pre,
+                    created_by: resource
+                }));
 
             await Quality.bulkCreate(qualityTaskRecords, {
                 transaction
@@ -108,17 +124,15 @@ class QualityService {
             const recordIds = details.map((detail) => detail.id);
 
             const qualityRecords = details.map((detail) => ({
-                id: detail.id,
-                project: detail.project,
                 assigned_to: detail.assigned_to,
                 task: detail.task,
                 is_valid: detail.is_valid,
-                quality_template_id: detail.quality_template_id,
+                is_pre: detail.is_pre,
                 updated_by: resource
             }));
 
             await Quality.bulkUpdate(qualityRecords, {
-                updateOnDuplicate: ['assigned_to', 'task', 'is_valid']
+                updateOnDuplicate: ['assigned_to', 'task', 'is_valid','is_pre']
             });
 
             await transaction.commit();
@@ -132,7 +146,7 @@ class QualityService {
         }
     }
 
-    async deleteTask(taskId) {
+    async deleteTask(taskId, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
@@ -150,7 +164,8 @@ class QualityService {
             }
 
             await Quality.update({
-                is_active: false
+                is_active: false,
+                updated_by: resource
             }, {
                 where: {
                     id: taskId
