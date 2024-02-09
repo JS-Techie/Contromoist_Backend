@@ -4,6 +4,8 @@ const qualityService = require("./quality")
 const projectService = require("./projects")
 const projectTypeService = require("./project_types")
 const projectResourceService = require("./project_resources")
+const projectStatusService = require("./project_status")
+const projectTemplateService = require("./templates/projects")
 
 module.exports = {
     travelService,
@@ -12,5 +14,7 @@ module.exports = {
     travelService,
     projectService,
     projectTypeService,
-    projectResourceService
+    projectResourceService,
+    projectStatusService,
+    projectTemplateService
 }

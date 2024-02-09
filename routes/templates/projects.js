@@ -1,10 +1,13 @@
 const projectTemplateRouter = require("express").Router()
 
-projectTemplateRouter.route("/").get()
-projectTemplateRouter.route("/:id").get()
-projectTemplateRouter.route("/").post()
-projectTemplateRouter.route("/:id").patch()
-projectTemplateRouter.route("/:id").delete()
+const {authenticate} = require("../middleware")
+
+
+projectTemplateRouter.route("/").get(projectTemplateController.fetchAll)
+projectTemplateRouter.route("/:id").get(projectTemplateController.fetchById)
+projectTemplateRouter.route("/").post(projectTemplateController.create)
+projectTemplateRouter.route("/:id").patch(projectTemplateController.edit)
+projectTemplateRouter.route("/:id").delete(projectTemplateController.delete)
 
 
 module.exports = projectTemplateRouter
