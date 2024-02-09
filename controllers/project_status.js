@@ -2,16 +2,17 @@ const {
     Response,
     print,
     logType
-} = require('../../utils');
-const db = require('../../models');
+} = require('../utils');
+const db = require('../models');
 const {
-    projectTemplateService
-} = require('../../services');
+    projectService,
+    projectStatusService
+} = require('../services');
 const {
     Sequelize
 } = require('sequelize');
 
-class ProjectTemplateController {
+class ProjectStatusController {
 
     async fetchAll(req, res, next) {
         try {
@@ -20,8 +21,9 @@ class ProjectTemplateController {
             }
 
             type = req.query.type == undefined ? null : req.query.type
+            alertType = req.query.alertType == undefined ? null : req.query.alertType
 
-            const [data, ok] = await projectTemplateService.fetchAll(type)
+            const [data, ok] = await projectStatusService.fetchAll(type, alertType)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -41,13 +43,13 @@ class ProjectTemplateController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const projectTemplateId = req.params.id;
+            const projectStatusId = req.params.id;
 
-            if (!projectTemplateId) {
-                return Response.errorGeneric([], 'Project Template ID Empty', 'This project Type Template ID doesn\'t exist or is invalid!')(res);
+            if (!projectStatusId) {
+                return Response.errorGeneric([], 'Project Status ID Empty', 'This project Type Status ID doesn\'t exist or is invalid!')(res);
             }
 
-            const [data, ok] = await projectTemplateService.fetchById(projectTemplateId)
+            const [data, ok] = await projectStatusService.fetchById(projectStatusId)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -68,9 +70,9 @@ class ProjectTemplateController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const { projectTemplateDetails } = req.body
+            const { projectStatusDetails } = req.body
 
-            const [data, ok] = await projectTemplateService.create(projectTemplateDetails, req.user.id)
+            const [data, ok] = await projectStatusService.create(projectStatusDetails, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric(data)(res)
@@ -91,10 +93,10 @@ class ProjectTemplateController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const { projectTemplateDetails } = req.body
-            const projectTemplateId = req.params.id
+            const { projectStatusDetails } = req.body
+            const projectStatusId = req.params.id
 
-            const [data, ok] = await projectTemplateService.edit(projectTemplateId, projectTemplateDetails, req.user.id)
+            const [data, ok] = await projectStatusService.edit(projectStatusId, projectStatusDetails, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric(data)(res)
@@ -115,9 +117,9 @@ class ProjectTemplateController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const projectTemplateId = req.params.id
+            const projectStatusId = req.params.id
 
-            const [data, ok] = await projectTemplateService.delete(projectTemplateId, req.user.id)
+            const [data, ok] = await projectStatusService.delete(projectStatusId, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric(data)(res)
@@ -132,4 +134,4 @@ class ProjectTemplateController {
 
 }
 
-module.exports = new ProjectTemplateController();
+module.exports = new ProjectStatusController();

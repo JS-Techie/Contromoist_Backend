@@ -4,6 +4,8 @@ const qualityController = require("./quality")
 const projectController = require("./projects")
 const projectTypeController = require("./project_types")
 const projectResourceController = require("./project_resources")
+const projectStatusController = require("./project_status")
+const ProjectTemplateController = require("./templates/projects")
 
 module.exports = {
     travelController,
@@ -11,5 +13,7 @@ module.exports = {
     qualityController,
     projectController,
     projectTypeController,
-    projectResourceController
+    projectResourceController,
+    projectStatusController,
+    ProjectTemplateController
 }
