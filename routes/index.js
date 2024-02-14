@@ -3,6 +3,7 @@ const swaggerUI = require("swagger-ui-express");
 
 const travelRouter = require("./travel")
 const qualityTemplateRouter = require("./templates/quality")
+const qualityTemplateTaskRouter = require("./templates/quality_tasks")
 const qualityRouter = require("./quality")
 const projectRouter = require("./projects")
 const projectTemplateRouter = require("./templates/projects")
@@ -13,10 +14,10 @@ const projectStatusRouter = require("./project_status")
 const setupRoutes = (app) => {
 
     app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(endPoint));
-    app.use("api/travel",travelRouter)
-    app.use("api/quality",qualityRouter)
-    app.use("api/template/quality", qualityTemplateRouter)
     app.use("/api/travel",travelRouter)
+    app.use("/api/quality",qualityRouter)
+    app.use("/api/template/quality", qualityTemplateRouter)
+    app.use("/api/template/quality/task", qualityTemplateTaskRouter)
     app.use("/api/project",projectRouter)
     app.use("/api/project/type",projectTypeRouter)
     app.use("/api/project/resource",projectResourceRouter)

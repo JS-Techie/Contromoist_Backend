@@ -3,6 +3,7 @@ const {
     logType
 } = require("../utils");
 const db = require("../models");
+const {sequelize} = require('../models')
 
 const {
     QualityTemplateTask,
@@ -12,25 +13,29 @@ const {
 
 class QualityService {
 
-    async fetchAll(is_pre) {
+    async fetchAll(is_pre, project) {
         try {
 
             const tasks = await Quality.findAll({
-                where: is_pre ? { is_pre } : {}
+                where: {
+                        ...(is_pre ? { is_pre } : {}),
+                        ...(project ? { project }: {}),
+                        is_active: true
+                }
             }
             );
 
             if (!tasks || tasks.length === 0) {
                 print('TASKS FETCHED BUT EMPTY', logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print('TASKS FETCHED', logType.success);
-            return (tasks, true);
+            return [tasks, true];
 
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -44,51 +49,26 @@ class QualityService {
 
             if (!task) {
                 print('TASK FETCHED BUT EMPTY', logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print('TASK FETCHED', logType.success);
-            return (task, true);
+            return [task, true];
 
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
-    async fetchByProjectId(project, is_pre) {
-        try {
-
-            const tasks = await Quality.findAll({
-                where: is_pre ? {
-                    project,
-                    is_pre
-                } : {
-                    project
-                }
-            });
-
-            if (!tasks || tasks.length === 0) {
-                print('TASKS FETCHED BUT EMPTY BY PROJECT ID', logType.warning);
-                return ([], true);
-            }
-            print('TASKS FETCHED BY PROJECT ID', logType.success);
-            return (tasks, true);
-
-        } catch (error) {
-            print(String(error), logType.error);
-            return (String(error), false);
-        }
-    }
-
-    async createTask(quality_template_id, project_id, resource) {
+    async createTask(qualityTemplateId, project_id, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
 
             const templateDatas = await QualityTemplateTask.findAll({
                 where:{
-                    template_id: quality_template_id,
+                    template_id: qualityTemplateId,
                     is_active: true
                 }
             })
@@ -97,6 +77,8 @@ class QualityService {
                     project: project_id,
                     task: detail.task,
                     is_pre: detail.is_pre,
+                    quality_template_id: qualityTemplateId,
+                    is_valid: false,
                     created_by: resource
                 }));
 
@@ -108,22 +90,52 @@ class QualityService {
 
             print(`USER ${resource} CREATED NEW TASKS`, logType.success);
 
-            return (qualityTaskRecords, true);
+            return [qualityTaskRecords, true];
 
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
-    async editTask(resource, details) {
+    async addTask(task_details, resource) {
+        const transaction = await db.sequelize.transaction();
+
+        try {
+
+            const created_task = await Quality.create({
+                project : task_details.project,
+                assigned_to: task_details.assigned_to != undefined ? task_details.assigned_to : null,
+                task : task_details.task,
+                is_valid : false,
+                is_pre : task_details.is_pre,
+                created_by : resource
+            },{
+                transaction
+            })
+
+            await transaction.commit();
+
+            print(`USER ${resource} ADDED NEW TASKS`, logType.success);
+
+            return [created_task.id, true];
+
+        } catch (error) {
+            await transaction.rollback();
+            print(String(error), logType.error);
+            return [String(error), false];
+        }
+    }
+
+    async editTask(details, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
             const recordIds = details.map((detail) => detail.id);
 
             const qualityRecords = details.map((detail) => ({
+                id: detail.id,
                 assigned_to: detail.assigned_to,
                 task: detail.task,
                 is_valid: detail.is_valid,
@@ -131,18 +143,18 @@ class QualityService {
                 updated_by: resource
             }));
 
-            await Quality.bulkUpdate(qualityRecords, {
-                updateOnDuplicate: ['assigned_to', 'task', 'is_valid','is_pre']
+            await Quality.bulkCreate(qualityRecords, {
+                updateOnDuplicate: ['id','assigned_to', 'task', 'is_valid','is_pre','updated_by']
             });
 
             await transaction.commit();
 
-            return (recordIds, true);
+            return [recordIds, true];
 
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -160,7 +172,7 @@ class QualityService {
             if (!updatedTask) {
                 print('TASK NOT FOUND FOR DELETION', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await Quality.update({
@@ -176,11 +188,11 @@ class QualityService {
             await transaction.commit();
 
             print(`TASK DELETED: ${taskId}`, logType.success);
-            return (updatedTask, true);
+            return [updatedTask, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     };
 }

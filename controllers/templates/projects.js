@@ -19,7 +19,7 @@ class ProjectTemplateController {
                 return Response.errorUnauthorized()(res);
             }
 
-            type = req.query.type == undefined ? null : req.query.type
+            const type = req.query.type == undefined ? null : req.query.type
 
             const [data, ok] = await projectTemplateService.fetchAll(type)
 

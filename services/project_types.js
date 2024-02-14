@@ -17,14 +17,14 @@ class ProjectTypeService {
 
             if (!projectTypes || projectTypes.length === 0) {
                 print("PROJECT TYPES FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print("PROJECT TYPES FETCHED", logType.success);
-            return (projectTypes, true);
+            return [projectTypes, true];
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -40,38 +40,38 @@ class ProjectTypeService {
 
             if (!projectType) {
                 print("PROJECT FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print("PROJECT FETCHED", logType.success);
-            return (projectType, true);
+            return [projectType, true];
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
-    async create(projectTypeDetails) {
+    async create(projectTypeDetails, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
-            // Create the main project entry
-            const createdProjectType = await ProjectType.create(projectTypeDetails, {
+            
+            const createdProjectType = await ProjectType.create({...projectTypeDetails, "created_by": resource}, {
                 transaction,
             });
 
             await transaction.commit();
 
             print(`PROJECT TYPE CREATED: ${createdProjectType.id}`, logType.success);
-            return (createdProjectType, true);
+            return [createdProjectType, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
-    async edit(projectTypeId, projectTypeDetails) {
+    async edit(projectTypeId, projectTypeDetails, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
@@ -86,16 +86,15 @@ class ProjectTypeService {
             if (!projectType) {
                 print('PROJECT TYPE NOT FOUND TO UPDATE', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await ProjectType.update({
-                name : projectTypeDetails.name
+                name : projectTypeDetails.name,
+                updated_by : resource
             }, {
                 where: {
-                    id: projectTypeId,
-                    fields : ['name'],
-                    updateOnDuplicate : ['name']
+                    id: projectTypeId
                 },
                 transaction
             });
@@ -103,15 +102,15 @@ class ProjectTypeService {
             await transaction.commit();
 
             print(`PROJECT TYPE EDITED: ${projectTypeId}`, logType.success);
-            return (projectTypeId, true);
+            return [projectTypeId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
-    async delete(projectTypeId) {
+    async delete(projectTypeId, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
@@ -126,11 +125,12 @@ class ProjectTypeService {
             if (!projectType) {
                 print('PROJECT TYPE NOT FOUND TO DELETE', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await ProjectType.update({
-                is_active : false
+                is_active : false,
+                created_by : resource
             }, {
                 where: {
                     id: projectTypeId
@@ -140,12 +140,12 @@ class ProjectTypeService {
 
             await transaction.commit();
 
-            print(`PROJECT DELETED: ${projectId}`, logType.success);
-            return (projectId, true);
+            print(`PROJECT TYPE DELETED: ${projectTypeId}`, logType.success);
+            return [projectTypeId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 }

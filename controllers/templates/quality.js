@@ -10,6 +10,7 @@ const {
 const {
     Sequelize
 } = require('sequelize');
+const { log } = require('../../utils/logTypes');
 
 
 class QualityController {
@@ -22,7 +23,7 @@ class QualityController {
 
             const type = req.query.type == undefined ? null : req.query.type;
 
-            const [data, ok] = await qualityTemplateService.fetchAll(req.user.id, type)
+            const [data, ok] = await qualityTemplateService.fetchAll(type)
 
             if(!ok){
                 return Response.errorGeneric([], data)(res);
@@ -31,7 +32,7 @@ class QualityController {
             return Response.successFetch(data)(res);
 
         }catch(error){
-            print(String(error), log.type.error)
+            print(String(error), logType.error)
             return Response.errorGeneric([], error.message)(res)
         }
     }
@@ -67,7 +68,7 @@ class QualityController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const templateId = req.query.id
+            const templateId = req.query.templateId
 
             const [data, ok] = await qualityTemplateService.fetchAllTasks(templateId)
 
@@ -116,11 +117,9 @@ class QualityController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const {
-                details
-            } = req.body;
+            const {template, tasks} = req.body;
 
-            const [data, ok] = await qualityTemplateService.createTask(details, req.user.id)
+            const [data, ok] = await qualityTemplateService.createTask(template, tasks, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric([], data)(res);
@@ -154,9 +153,7 @@ class QualityController {
                 return Response.errorNotFound()(res);
             }
 
-            const {
-                details
-            } = req.body
+            const details = req.body
 
             if (!details || details.length === 0) {
                 return Response.errorGeneric([], 'Details array is required and should not be empty', 'Please provide valid details for editing the template task!')(res);
@@ -170,7 +167,7 @@ class QualityController {
 
             print(`USER ${req.user.id} EDITED TEMPLATE`, logType.success);
 
-            return Response.successUpdate(data)(res);
+            return Response.editSuccess(data)(res);
 
         } catch (error) {
             await transaction.rollback();
@@ -199,9 +196,7 @@ class QualityController {
                 return Response.errorNotFound()(res);
             }
 
-            const {
-                details
-            } = req.body
+            const details= req.body
 
             if (!details || details.length === 0) {
                 return Response.errorGeneric([], 'Details array is required and should not be empty', 'Please provide valid details for editing the template task!')(res);
@@ -215,7 +210,7 @@ class QualityController {
 
             print(`USER ${req.user.id} EDITED TASK`, logType.success);
 
-            return Response.successUpdate(data)(res);
+            return Response.editSuccess(data)(res);
 
         } catch (error) {
             await transaction.rollback();
@@ -230,14 +225,15 @@ class QualityController {
         try {
             const id = req.params.id;
             const is_template = req.query.is_template
-
-            if (is_template){
-                const [deleted, ok] = await qualityTemplateService.deleteTemplate(id, req.user.id);
+            let deleted, ok;
+            console.log(is_template);
+            if (is_template === true){
+                [deleted, ok] = await qualityTemplateService.deleteTemplate(id, req.user.id);
             }
             else{
-                const [deleted, ok] = await qualityTemplateService.deleteTask(id, req.user.id);
+                [deleted, ok] = await qualityTemplateService.deleteTask(id, req.user.id);
             }
-
+            
             if (!ok) {
                 await transaction.rollback();
                 return Response.errorGeneric([], deleted)(res);

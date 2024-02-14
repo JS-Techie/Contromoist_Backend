@@ -12,30 +12,17 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    project: {
+    template_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "project",
+      field: "template_id",
       references: {
         key: "id",
-        model: "t_project_model"
-      }
-    },
-    assigned_to: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "assigned_to",
-      references: {
-        key: "id",
-        model: "users_model"
+        model: "t_quality_template_model"
       }
     },
     task: {
@@ -46,28 +33,6 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "task"
-    },
-    is_valid: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_valid"
-    },
-    quality_template_id: {
-      type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "quality_template_id",
-      references: {
-        key: "id",
-        model: "t_quality_template_model"
-      }
     },
     is_pre: {
       type: DataTypes.INTEGER(1),
@@ -133,23 +98,13 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_quality",
+    tableName: "t_quality_template_task",
     comment: "",
     indexes: [{
-      name: "project",
+      name: "template_id",
       unique: false,
       type: "BTREE",
-      fields: ["project"]
-    }, {
-      name: "assigned_to",
-      unique: false,
-      type: "BTREE",
-      fields: ["assigned_to"]
-    }, {
-      name: "quality_template_id",
-      unique: false,
-      type: "BTREE",
-      fields: ["quality_template_id"]
+      fields: ["template_id"]
     }, {
       name: "created_by",
       unique: false,
@@ -162,6 +117,6 @@ module.exports = sequelize => {
       fields: ["updated_by"]
     }]
   };
-  const TQualityModel = sequelize.define("t_quality_model", attributes, options);
-  return TQualityModel;
+  const TQualityTemplateTaskModel = sequelize.define("t_quality_template_task_model", attributes, options);
+  return TQualityTemplateTaskModel;
 };

@@ -1,5 +1,6 @@
 const { print, logType } = require("../utils");
 const db = require("../models");
+const {sequelize} = require("../models")
 
 const {
     Project,
@@ -11,82 +12,53 @@ class ProjectResourceService {
 
     async fetchAll() {
         try {
-            const projectResources = await ProjectResource.findAll({
-                include:[
-                    {
-                        model : Users,
-                        attributes : ["name","phone","email_id"],
-                        where : {
-                                id : db.Sequelize.col('users.id')
-                        }
-                    },
-                    {
-                        model : Project,
-                        attributes : ["name"],
-                        where : {
-                                id : db.sequelize.col('t_project.id')
-                        }
-                    }
-                ],
-                where: { 
-                        is_active: true
-                    }
-            });
+            const [projectResources, metadata] = await sequelize.query(
+                                    `SELECT t_project_resource.*, users.name as user_name, users.phone as user_phone, users.email_id as user_email_id, t_project.name as project_name
+                                    FROM t_project_resource
+                                    LEFT JOIN users ON t_project_resource.resource = users.id
+                                    LEFT JOIN t_project ON t_project_resource.project = t_project.id
+                                    WHERE t_project_resource.is_active = TRUE;`
+                                    )
 
             if (!projectResources || projectResources.length === 0) {
                 print("PROJECT RESOURCES FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print("PROJECT RESOURCE FETCHED", logType.success);
-            return (projectResources, true);
+            return [projectResources, true];
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
     async fetchById(projectResourceId) {
 
         try {
-            const projectResource = await ProjectResource.findOne({
-                include:[
-                    {
-                        model : Users,
-                        attributes : ["name","phone","email_id"],
-                        where : {
-                                id : db.Sequelize.col('t_project_resource.id')
-                        }
-                    },
-                    {
-                        model : Project,
-                        attributes : ["name"],
-                        where : {
-                                id : db.sequelize.col('t_project.id')
-                        }
-                    }
-                ],
-                where: { 
-                        is_active : true,
-                        id : projectResourceId
-                    }
-            });
+            const [projectResource, metadata] = await sequelize.query(
+                                `SELECT t_project_resource.*, users.name as user_name, users.phone as user_phone, users.email_id as user_email_id, t_project.name as project_name
+                                FROM t_project_resource
+                                LEFT JOIN users ON t_project_resource.resource = users.id
+                                LEFT JOIN t_project ON t_project_resource.project = t_project.id
+                                WHERE t_project_resource.id = ${projectResourceId};`
+                                )
 
             if (!projectResource || projectResource.length === 0) {
                 print("PROJECT RESOURCE FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             if (!projectResource) {
                 print("PROJECT RESOURCE FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print("PROJECT RESOURCE FETCHED", logType.success);
-            return (projectResource, true);
+            return [projectResource[0], true];
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -103,18 +75,20 @@ class ProjectResourceService {
                 created_by: resource
             }));
 
-            await projectResource.bulkCreate(projectResourceRecords, {
+            console.log("THE REcoRDS ::", projectResourceRecords)
+
+            await ProjectResource.bulkCreate(projectResourceRecords, {
                 transaction
             });
 
             await transaction.commit();
 
             print(`PROJECT(S) RESOURCE CREATED`, logType.success);
-            return (projectResourceRecords, true);
+            return [projectResourceRecords, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -133,20 +107,17 @@ class ProjectResourceService {
             if (!projectResource) {
                 print('PROJECT RESOURCE NOT FOUND TO UPDATE', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await ProjectResource.update({
-                project: projectResourceDetails.project,
                 resource: projectResourceDetails.resource,
                 allocation: projectResourceDetails.allocation,
                 is_pm: projectResourceDetails.is_pm,
                 updated_by: resource
             }, {
                 where: {
-                    id: projectResourceId,
-                    fields : ['project','resource','allocation','is_pm','updated_by'],
-                    updateOnDuplicate : ['project','resource','allocation','is_pm']
+                    id: projectResourceId
                 },
                 transaction
             });
@@ -154,11 +125,11 @@ class ProjectResourceService {
             await transaction.commit();
 
             print(`PROJECT RESOURCE EDITED: ${projectResourceId}`, logType.success);
-            return (projectResourceId, true);
+            return [projectResourceId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -177,7 +148,7 @@ class ProjectResourceService {
             if (!projectResource) {
                 print('PROJECT RESOURCE NOT FOUND TO DELETE', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await ProjectResource.update({
@@ -192,12 +163,12 @@ class ProjectResourceService {
 
             await transaction.commit();
 
-            print(`PROJECT RESOURCE DELETED: ${projectId}`, logType.success);
-            return (projectId, true);
+            print(`PROJECT RESOURCE DELETED: ${projectResourceId}`, logType.success);
+            return [projectResourceId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 }

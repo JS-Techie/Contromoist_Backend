@@ -4,6 +4,8 @@ const {authenticate} = require("../middleware")
 
 const{projectStatusController} = require("../controllers")
 
+projectStatusRouter.use(authenticate)
+
 projectStatusRouter.route("/").get(projectStatusController.fetchAll)
 projectStatusRouter.route("/:id").get(projectStatusController.fetchById)
 projectStatusRouter.route("/").post(projectStatusController.create)
