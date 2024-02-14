@@ -263,11 +263,6 @@ module.exports = sequelize => {
       type: "BTREE",
       fields: ["project_template_id"]
     }, {
-      name: "quality_id",
-      unique: false,
-      type: "BTREE",
-      fields: ["quality_id"]
-    }, {
       name: "created_by",
       unique: false,
       type: "BTREE",
@@ -277,6 +272,11 @@ module.exports = sequelize => {
       unique: false,
       type: "BTREE",
       fields: ["updated_by"]
+    }, {
+      name: "quality_id",
+      unique: false,
+      type: "BTREE",
+      fields: ["quality_id"]
     }]
   };
   const TProjectModel = sequelize.define("t_project_model", attributes, options);

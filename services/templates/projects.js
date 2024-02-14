@@ -1,4 +1,4 @@
-const { print, logType } = require("../utils");
+const { print, logType } = require("../../utils");
 const db = require("../../models");
 
 const {

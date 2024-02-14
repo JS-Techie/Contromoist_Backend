@@ -21,14 +21,23 @@ module.exports = sequelize => {
       comment: null,
       field: "type"
     },
-    task: {
+    title: {
       type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "task"
+      field: "title"
+    },
+    desc: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "desc"
     },
     created_by: {
       type: DataTypes.BIGINT.UNSIGNED,

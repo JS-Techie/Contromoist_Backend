@@ -20,8 +20,8 @@ class ProjectStatusController {
                 return Response.errorUnauthorized()(res);
             }
 
-            type = req.query.type == undefined ? null : req.query.type
-            alertType = req.query.alertType == undefined ? null : req.query.alertType
+            const type = req.query.type == undefined ? null : req.query.type
+            const alertType = req.query.alertType == undefined ? null : req.query.alertType
 
             const [data, ok] = await projectStatusService.fetchAll(type, alertType)
 
@@ -70,13 +70,15 @@ class ProjectStatusController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const { projectStatusDetails } = req.body
+            const projectStatusDetails = req.body
 
             const [data, ok] = await projectStatusService.create(projectStatusDetails, req.user.id)
 
             if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
+
+            return Response.successCreate(data)(res);
 
         } catch (error) {
             await transaction.rollback();
@@ -93,7 +95,7 @@ class ProjectStatusController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const { projectStatusDetails } = req.body
+            const projectStatusDetails = req.body
             const projectStatusId = req.params.id
 
             const [data, ok] = await projectStatusService.edit(projectStatusId, projectStatusDetails, req.user.id)
@@ -101,6 +103,8 @@ class ProjectStatusController {
             if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
+
+            return Response.editSuccess(data)(res)
 
         } catch (error) {
             await transaction.rollback();
@@ -124,6 +128,8 @@ class ProjectStatusController {
             if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
+
+            return Response.deleteSuccess(data)(res);
 
         } catch (error) {
             await transaction.rollback();

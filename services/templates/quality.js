@@ -16,21 +16,22 @@ class QualityTemplateService {
         try {
             const templates = await QualityTemplate.findAll({
                 where:{
-                    ...(type ? {type} : {})
+                    ...(type ? {type} : {}),
+                    is_active: true
                 },
             });
 
             if (!templates || templates.length === 0) {
                 print('QUALITY TEMPLATE FETCHED BUT EMPTY', logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print('QUALITY TEMPLATE FETCHED', logType.success);
-            return (templates, true);
+            return [templates, true];
 
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -42,15 +43,15 @@ class QualityTemplateService {
 
             if (!template) {
                 print('TEMPLATE FETCHED BUT EMPTY', logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print('TEMPLATE FETCHED', logType.success);
-            return (template, true);
+            return [template, true];
 
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -62,15 +63,15 @@ class QualityTemplateService {
 
             if (!task) {
                 print('TASK FETCHED BUT EMPTY', logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print('TASK FETCHED', logType.success);
-            return (task, true);
+            return [task, true];
 
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -78,47 +79,51 @@ class QualityTemplateService {
         try {
             const template_tasks = await QualityTemplateTask.findAll({
                 where:{
-                    template_id
+                    template_id: template_id,
+                    is_active: true
                 },
             });
+            console.log("ghjk", template_tasks)
 
             if (!template_tasks || template_tasks.length === 0) {
                 print('QUALITY TEMPLATE TASKS FETCHED BUT EMPTY', logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print('QUALITY TEMPLATE TASKS FETCHED', logType.success);
-            return (template_tasks, true);
+            return [template_tasks, true];
 
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
-    async createTask(details, resource) {
+    async createTask(template, tasks, resource) {
         const transaction = await db.sequelize.transaction();
 
         try {
 
-            const createdTemplate = await QualityTemplate.create(
-                {
-                    type : details.type,
-                    title : details.title,
-                    desc : details.desc,
-                    created_by : resource
-                },
-                {
-                transaction,
-            });
+            let createdTemplate;
+            const templateProvided = (template != undefined && Object.keys(template).length) > 0 ? true : false
 
-            const template_id = createdTemplate.id
+            if (templateProvided === true){
+                createdTemplate = await QualityTemplate.create(
+                    {
+                        type : template.type,
+                        title : template.title,
+                        desc : template.desc,
+                        created_by : resource
+                    },
+                    {
+                    transaction,
+                });
+            }
 
-            const TemplateTaskRecords = details.task.map((detail) => ({
-                template_id : template_id,
-                title : detail.title,
-                desc : detail.desc,
-                is_pre : detail.is_pre,
+            const TemplateTaskRecords = tasks.map((task) => ({
+                template_id : templateProvided === true ? createdTemplate.id : task.template_id,
+                task : task.task,
+                is_pre : task.is_pre,
                 created_by : resource
             }));
 
@@ -130,12 +135,12 @@ class QualityTemplateService {
 
             print(`USER ${resource} CREATED NEW QUALITY TEMPLATE TASKS`, logType.success);
 
-            return (createdTemplate, true);
+            return [templateProvided === true ? createdTemplate.id : tasks[0].template_id, true];
 
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -150,36 +155,6 @@ class QualityTemplateService {
                 updated_by: resource
             }, {
                 where: {
-                    id: templateId,
-                    fields : ['type','title','desc','updated_by'],
-                    updateOnDuplicate : ['type','title','desc']
-                },
-                transaction
-            });
-
-            await transaction.commit();
-
-            return (templateId, true);
-
-        } catch (error) {
-            await transaction.rollback();
-            print(String(error), logType.error);
-            return (String(error), false);
-        }
-    }
-
-    async editTask(details, resource) {
-        const transaction = await db.sequelize.transaction();
-
-        try {
-            await QualityTemplateTask.update({
-                ...(details.templateId !== null && { template_id: details.templateId }),
-                title : details.title,
-                desc : details.desc, 
-                is_pre : details.is_pre,
-                updated_by: resource
-            }, {
-                where: {
                     id: templateId
                 },
                 transaction
@@ -187,12 +162,39 @@ class QualityTemplateService {
 
             await transaction.commit();
 
-            return (recordIds, true);
+            return [templateId, true];
 
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
+        }
+    }
+
+    async editTask(details, taskId, resource) {
+        const transaction = await db.sequelize.transaction();
+
+        try {
+            await QualityTemplateTask.update({
+                ...(details.template_id !== null && { template_id: details.template_id }),
+                task : details.task,
+                is_pre : details.is_pre,
+                updated_by: resource
+            }, {
+                where: {
+                    id: taskId
+                },
+                transaction
+            });
+
+            await transaction.commit();
+
+            return [taskId, true];
+
+        } catch (error) {
+            await transaction.rollback();
+            print(String(error), logType.error);
+            return [String(error), false];
         }
     }
 
@@ -210,7 +212,7 @@ class QualityTemplateService {
             if (!updatedTemplate) {
                 print('QUALITY TEMPLATE NOT FOUND FOR DELETION', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await QualityTemplate.update({
@@ -224,9 +226,9 @@ class QualityTemplateService {
                 transaction
             });
 
-            await QualityTemplateTask.bulkUpdate(
+            await QualityTemplateTask.update(
             {
-                is_active: true,
+                is_active: false,
                 updated_by: resource
             },
             {
@@ -238,11 +240,11 @@ class QualityTemplateService {
             await transaction.commit();
 
             print(`QUALITY TEMPLATE DELETED: ${templateId}`, logType.success);
-            return (updatedTemplate, true);
+            return [updatedTemplate, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -250,7 +252,8 @@ class QualityTemplateService {
         const transaction = await db.sequelize.transaction();
 
         try {
-            const updatedTask = await QualityTemplate.findOne({
+
+            const updatedTask = await QualityTemplateTask.findOne({
                 where: {
                     id: taskId
                 },
@@ -260,10 +263,10 @@ class QualityTemplateService {
             if (!updatedTask) {
                 print('QUALITY TEMPLATE TASK NOT FOUND FOR DELETION', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
-            await QualityTemplate.update({
+            await QualityTemplateTask.update({
                 is_active: false,
                 updated_by: resource
             }, {
@@ -276,11 +279,11 @@ class QualityTemplateService {
             await transaction.commit();
 
             print(`QUALITY TEMPLATE TASK DELETED: ${taskId}`, logType.success);
-            return (updatedTask, true);
+            return [taskId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     };
 }

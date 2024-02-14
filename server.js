@@ -19,6 +19,15 @@ server.use(logger)
 setupRoutes(server)
 
 // server.use("/travel",travelRouter)
+server.get("/token", (req, res) => {
+  const jwt = require('jsonwebtoken');
+  const secretKey = '1@3$5^7*9)qpalzm10';
+  const jsonPayload = {"id": "1", "name": "user ONE", "isAdmin":true};
+  const token =  jwt.sign(jsonPayload, secretKey)
+  return res.status(200).send({
+    'token':token
+  })
+})
 
 server.get("/check", (req, res) => {
   return res.status(200).send({
@@ -26,7 +35,7 @@ server.get("/check", (req, res) => {
   })
 });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT;
 server.listen(PORT, () => {
   setupDB()
   print(`Server is running on ${PORT}`,"SUCCESS")

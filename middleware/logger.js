@@ -18,14 +18,14 @@ morgan.token("logger", (req, res) => {
 
     print(log, "LOG");
 
-    const fileName = path.join("./docs/logs/", `${formattedDate}.txt`);
+    // const fileName = path.join("./docs/logs/", `${formattedDate}.txt`);
 
-    if (!fs.existsSync(fileName)) {
-        // If the file doesn't exist, create it
-        fs.writeFileSync(fileName, '');
-    }
+    // if (!fs.existsSync(fileName)) {
+    //     // If the file doesn't exist, create it
+    //     fs.writeFileSync(fileName, '');
+    // }
 
-    fs.appendFileSync(fileName, log);
+    // fs.appendFileSync(fileName, log);
 
     return "";
 });

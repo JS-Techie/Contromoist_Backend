@@ -66,13 +66,6 @@ class ProjectResourceController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const [error , resourceAssignedToProject] = await projectResourceService.resourceAssignedToProject(projectId, req.user.id, isAdmin);
-
-            if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO CREATE NEW PROJECT RESOURCE BUT UNAUTHORIZED`, logType.error);
-                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
-            }
-
             const projectResourceDetails = req.body
             const resource  = req.user.id
 
@@ -81,6 +74,8 @@ class ProjectResourceController {
             if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
+
+            return Response.successCreate(data)(res)
 
 
         } catch (error) {
@@ -98,13 +93,6 @@ class ProjectResourceController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const [error , resourceAssignedToProject] = await projectResourceService.resourceAssignedToProject(projectId, req.user.id, isAdmin);
-
-            if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO EDIT PROJECT RESOURCE BUT UNAUTHORIZED`, logType.error);
-                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
-            }
-
             const projectResourceDetails = req.body
             const projectResourceId = req.params.id
             const resource = req.user.id
@@ -114,6 +102,8 @@ class ProjectResourceController {
             if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
+
+            return Response.editSuccess(data)(res);
 
         } catch (error) {
             await transaction.rollback();
@@ -130,13 +120,6 @@ class ProjectResourceController {
                 return Response.errorUnauthorized()(res);
             }
 
-            const [error , resourceAssignedToProject] = await projectResourceService.resourceAssignedToProject(projectId, req.user.id, isAdmin);
-
-            if (!resourceAssignedToProject) {
-                print(`USER ${req.user.id} WANTED TO DELETE A PROJECT RESOURCE BUT UNAUTHORIZED`, logType.error);
-                return Response.errorGeneric([], 'Not authorized for this project', 'You are not assigned to this project!')(res);
-            }
-
             const projectResourceId = req.params.id
             const resource = req.user.id
 
@@ -145,6 +128,8 @@ class ProjectResourceController {
             if (!ok) {
                 return Response.errorGeneric(data)(res)
             }
+
+            return Response.deleteSuccess(data)(res)
 
         } catch (error) {
             await transaction.rollback();

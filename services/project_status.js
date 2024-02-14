@@ -13,20 +13,20 @@ class ProjectStatusService {
                 where: { 
                         is_active: true,
                         ...(type ? {type} : {}),
-                        ...(alertType ? {alertType} : {})
+                        ...(alertType ? {alert_type : alertType }: {})
                     }
             });
 
             if (!projectStatuses || projectStatuses.length === 0) {
                 print("PROJECT STATUSES FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print("PROJECT STATUSES FETCHED", logType.success);
-            return (projectStatuses, true);
+            return [projectStatuses, true];
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -42,14 +42,14 @@ class ProjectStatusService {
 
             if (!projectStatus) {
                 print("PROJECT STATUS FETCHED BUT EMPTY", logType.warning);
-                return ([], true);
+                return [[], true];
             }
 
             print("PROJECT STATUS FETCHED", logType.success);
-            return (projectStatus, true);
+            return [projectStatus, true];
         } catch (error) {
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -64,11 +64,11 @@ class ProjectStatusService {
             await transaction.commit();
 
             print(`PROJECT STATUS CREATED: ${createdProjectStatus.id}`, logType.success);
-            return (createdProjectStatus, true);
+            return [createdProjectStatus, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -87,7 +87,7 @@ class ProjectStatusService {
             if (!projectStatus) {
                 print('PROJECT STATUS NOT FOUND TO UPDATE', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await ProjectStatus.update({
@@ -97,9 +97,7 @@ class ProjectStatusService {
                 updated_by : resource
             }, {
                 where: {
-                    id: projectStatusId,
-                    fields : ['type', 'desc', 'alert_type', 'updated_by'],
-                    updateOnDuplicate : ['type', 'desc', 'alert_type']
+                    id: projectStatusId
                 },
                 transaction
             });
@@ -107,11 +105,11 @@ class ProjectStatusService {
             await transaction.commit();
 
             print(`PROJECT STATUS EDITED: ${projectStatusId}`, logType.success);
-            return (projectStatusId, true);
+            return [projectStatusId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 
@@ -130,7 +128,7 @@ class ProjectStatusService {
             if (!projectStatus) {
                 print('PROJECT STATUS NOT FOUND TO DELETE', logType.warning);
                 await transaction.rollback();
-                return ([], false);
+                return [[], false];
             }
 
             await ProjectStatus.update({
@@ -145,12 +143,12 @@ class ProjectStatusService {
 
             await transaction.commit();
 
-            print(`PROJECT STATUS DELETED: ${projectStatus.id}`, logType.success);
-            return (projectStatus.id, true);
+            print(`PROJECT STATUS DELETED: ${projectStatusId}`, logType.success);
+            return [projectStatusId, true];
         } catch (error) {
             await transaction.rollback();
             print(String(error), logType.error);
-            return (String(error), false);
+            return [String(error), false];
         }
     }
 }
